@@ -62,18 +62,10 @@ console.log('got event:', event);
 Method `emit` simplifies event dispatching. Instead of creating an event object and calling `dispatchEvent`...
 
 ```typescript
-const target = new EventTarget();
-
-target.addEventListener('my-event', (event) => {
-  console.log('got event:', event);
-  console.log('event detail:', event.detail);
-});
-
-const event = ;
 target.dispatchEvent(
-  new CustomEvent(
+  new NeoEvent(
     'my-event',
-    { detail: 'some data' },
+    'some data',
   ),
 );
 ```
@@ -81,21 +73,12 @@ target.dispatchEvent(
 ...you can just call `emit`:
 
 ```typescript
-const target = new NeoEventTarget();
-
-target.on<NeoEvent<string>>('my-event', (event) => {
-  console.log('got event:', event);
-  console.log('event detail:', event.detail);
-});
-
 target.emit('my-event', 'some data');
 ```
 
-By calling `emit` method, an event object of type `NeoEvent` is created.
-
 ### Class `NeoEvent`
 
-Class `NeoEvent` extends the standard `Event`. It provides a `detail` property that is initialized with the second argument of the constructor — like standard `CustomEvent` class.
+Class `NeoEvent` extends the standard `Event`. It provides a `detail` property that is initialized with the second argument of the constructor. After dropping Node 16 support, this class will be replaced with `CustomEvent`.
 
 ```typescript
 const event = new NeoEvent('my-event', 'some data');

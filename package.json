@@ -1,6 +1,6 @@
 {
 	"name": "neoevents",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "",
 	"publishConfig": {
 		"access": "public"
@@ -32,7 +32,7 @@
 		"build:esm": "bun build src/main.ts --outfile=dist/esm/main.js --minify",
 		"build:ts": "rm -r dist/esm dist/types ; tsc --emitDeclarationOnly",
 		"lint": "eslint . && tsc --skipLibCheck --noemit",
-		"publish:npm": "bun run build && bun run lint && bun run test && npm publish",
+		"publish:npm": "bun run lint && bun run build && bun run test && npm publish",
 		"test": "bun test --coverage"
 	},
 	"repository": {

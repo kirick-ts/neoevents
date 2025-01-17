@@ -18,8 +18,7 @@ interface EventListener {
 	(evt: Event): void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class NeoEvent<D = any> extends Event {
+export class NeoEvent<D = unknown> extends Event {
 	constructor(
 		type: string,
 		public detail: D,
@@ -57,6 +56,12 @@ export class NeoEventTarget extends EventTarget {
 		return off;
 	}
 
+	/**
+	 * Adds an event listener.
+	 * @param type - The event type to listen for.
+	 * @param listener - The event listener.
+	 * @returns A function that removes the event listener when called.
+	 */
 	on<E extends Event = NeoEvent>(
 		type: string,
 		listener: (event: E) => void,
@@ -67,6 +72,12 @@ export class NeoEventTarget extends EventTarget {
 		);
 	}
 
+	/**
+	 * Adds an event listener that will be automatically removed once it is called.
+	 * @param type - The event type to listen for.
+	 * @param listener - The event listener.
+	 * @returns A function that removes the event listener when called.
+	 */
 	once<E extends Event = NeoEvent>(
 		type: string,
 		listener: (event: E) => void,
@@ -78,6 +89,11 @@ export class NeoEventTarget extends EventTarget {
 		);
 	}
 
+	/**
+	 * Waits for an event like `once` but returns a promise.
+	 * @param type - The event type to listen for.
+	 * @returns Promise that resolves with the event.
+	 */
 	wait<E extends Event = NeoEvent>(type: string) {
 		return new Promise<E>((resolve) => {
 			this.once<E>(
@@ -89,12 +105,20 @@ export class NeoEventTarget extends EventTarget {
 		});
 	}
 
-	emit(type: string, data?: unknown) {
+	/**
+	 * Creates an instance of `NeoEvent` and dispatches it.
+	 * @param type - The event type to emit.
+	 * @param detail - Data to be set as event `detail` property.
+	 */
+	emit(type: string, detail?: unknown) {
 		this.dispatchEvent(
-			new NeoEvent(type, data),
+			new NeoEvent(type, detail),
 		);
 	}
 
+	/**
+	 * Destroys an event target, removing all listeners.
+	 */
 	destroy() {
 		for (const off of this.listeners) {
 			off();
