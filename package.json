@@ -1,6 +1,6 @@
 {
 	"name": "neoevents",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"description": "",
 	"publishConfig": {
 		"access": "public"
@@ -8,6 +8,8 @@
 	"type": "module",
 	"main": "dist/esm/main.js",
 	"types": "dist/esm/main.d.ts",
+	"unpkg": "dist/esm/main.min.js",
+	"jsdelivr": "dist/esm/main.min.js",
 	"exports": {
 		".": {
 			"import": "./dist/esm/main.js",
@@ -22,18 +24,22 @@
 		"@types/bun": "^1.1.13",
 		"@types/node": "^20.14.10",
 		"eslint": "9.10.0",
+		"tsd": "^0.31.2",
 		"typescript": "5.5.4",
 		"vitest": "2.1.1"
 	},
 	"scripts": {
-		"build": "bun run build:ts && bun run build:esm && bun run build:cjs",
-		"--#--build:cjs": "bunx esbuild --bundle --minify --platform=node --format=cjs --packages=external --outfile=dist/main.cjs dist/esm/main.js",
-		"build:cjs": "bun build src/main.ts --outfile=dist/main.cjs --format=cjs --minify",
-		"build:esm": "bun build src/main.ts --outfile=dist/esm/main.js --minify",
+		"build": "rm -r dist ; bun run build:ts && bun run build:esm && bun run build:cjs",
+		"build:cjs": "bun build src/main.ts --outfile=dist/main.cjs --format=cjs",
+		"build:esm": "bun build src/main.ts --outfile=dist/esm/main.js && bun run build:esm:minify",
+		"build:esm:minify": "bun build src/main.ts --outfile=dist/esm/main.min.js --minify",
 		"build:ts": "rm -r dist/esm dist/types ; tsc --emitDeclarationOnly",
 		"lint": "eslint . && tsc --skipLibCheck --noemit",
 		"publish:npm": "bun run lint && bun run build && bun run test && npm publish",
-		"test": "bun test --coverage"
+		"test": "tsd -f src/main.test-d.ts && bun test --coverage"
+	},
+	"tsd": {
+		"directory": "tsd"
 	},
 	"repository": {
 		"type": "git",

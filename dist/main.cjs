@@ -1,1 +1,78 @@
-var{defineProperty:k,getOwnPropertyNames:x,getOwnPropertyDescriptor:z}=Object,A=Object.prototype.hasOwnProperty;var u=new WeakMap,B=(b)=>{var c=u.get(b),h;if(c)return c;if(c=k({},"__esModule",{value:!0}),b&&typeof b==="object"||typeof b==="function")x(b).map((j)=>!A.call(c,j)&&k(c,j,{get:()=>b[j],enumerable:!(h=z(b,j))||h.enumerable}));return u.set(b,c),c};var C=(b,c)=>{for(var h in c)k(b,h,{get:c[h],enumerable:!0,configurable:!0,set:(j)=>c[h]=()=>j})};var F={};C(F,{NeoEventTarget:()=>w,NeoEvent:()=>q});module.exports=B(F);class q extends Event{detail;constructor(b,c){super(b);this.detail=c}}class w extends EventTarget{listeners=new Set;addListener(b,c,h){this.addEventListener(b,c,h);let j=()=>{this.removeEventListener(b,c,h),this.listeners.delete(j)};return this.listeners.add(j),j}on(b,c){return this.addListener(b,c)}once(b,c){return this.addListener(b,c,{once:!0})}wait(b){return new Promise((c)=>{this.once(b,(h)=>{c(h)})})}emit(b,c){this.dispatchEvent(new q(b,c))}destroy(){for(let b of this.listeners)b();this.listeners.clear()}}
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __moduleCache = /* @__PURE__ */ new WeakMap;
+var __toCommonJS = (from) => {
+  var entry = __moduleCache.get(from), desc;
+  if (entry)
+    return entry;
+  entry = __defProp({}, "__esModule", { value: true });
+  if (from && typeof from === "object" || typeof from === "function")
+    __getOwnPropNames(from).map((key) => !__hasOwnProp.call(entry, key) && __defProp(entry, key, {
+      get: () => from[key],
+      enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+    }));
+  __moduleCache.set(from, entry);
+  return entry;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, {
+      get: all[name],
+      enumerable: true,
+      configurable: true,
+      set: (newValue) => all[name] = () => newValue
+    });
+};
+
+// src/main.ts
+var exports_main = {};
+__export(exports_main, {
+  NeoEventTarget: () => NeoEventTarget,
+  NeoEvent: () => NeoEvent
+});
+module.exports = __toCommonJS(exports_main);
+
+class NeoEvent extends Event {
+  detail;
+  constructor(type, detail) {
+    super(type);
+    this.detail = detail;
+  }
+}
+
+class NeoEventTarget extends EventTarget {
+  listeners = new Set;
+  addListener(type, listener, options) {
+    this.addEventListener(type, listener, options);
+    const off = () => {
+      this.removeEventListener(type, listener, options);
+      this.listeners.delete(off);
+    };
+    this.listeners.add(off);
+    return off;
+  }
+  on(type, listener) {
+    return this.addListener(type, listener);
+  }
+  once(type, listener) {
+    return this.addListener(type, listener, { once: true });
+  }
+  wait(type) {
+    return new Promise((resolve) => {
+      this.once(type, (event) => {
+        resolve(event);
+      });
+    });
+  }
+  emit(type, detail) {
+    return super.dispatchEvent(new NeoEvent(type, detail));
+  }
+  destroy() {
+    for (const off of this.listeners) {
+      off();
+    }
+    this.listeners.clear();
+  }
+}

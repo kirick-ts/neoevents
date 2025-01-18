@@ -27,7 +27,7 @@ export class NeoEvent<D = unknown> extends Event {
 	}
 }
 
-export class NeoEventTarget extends EventTarget {
+export class NeoEventTarget<EL extends Record<string, Event> | undefined = undefined> extends EventTarget {
 	private listeners = new Set<() => void>();
 
 	private addListener<const E extends Event>(
@@ -62,13 +62,24 @@ export class NeoEventTarget extends EventTarget {
 	 * @param listener - The event listener.
 	 * @returns A function that removes the event listener when called.
 	 */
-	on<E extends Event = NeoEvent>(
-		type: string,
-		listener: (event: E) => void,
+	on<
+		T extends string,
+		E extends Event | undefined = undefined,
+	>(
+		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
+		listener: (
+			event: E extends undefined
+				? EL extends undefined
+					? unknown
+					: T extends keyof EL
+						? EL[T]
+						: unknown
+				: E
+		) => void,
 	): () => void {
 		return this.addListener(
 			type,
-			listener,
+			listener as (event: unknown) => void,
 		);
 	}
 
@@ -78,13 +89,24 @@ export class NeoEventTarget extends EventTarget {
 	 * @param listener - The event listener.
 	 * @returns A function that removes the event listener when called.
 	 */
-	once<E extends Event = NeoEvent>(
-		type: string,
-		listener: (event: E) => void,
+	once<
+		T extends string,
+		E extends Event | undefined = undefined,
+	>(
+		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
+		listener: (
+			event: E extends undefined
+				? EL extends undefined
+					? unknown
+					: T extends keyof EL
+						? EL[T]
+						: unknown
+				: E
+		) => void,
 	): () => void {
 		return this.addListener(
 			type,
-			listener,
+			listener as (event: unknown) => void,
 			{ once: true },
 		);
 	}
@@ -94,12 +116,25 @@ export class NeoEventTarget extends EventTarget {
 	 * @param type - The event type to listen for.
 	 * @returns Promise that resolves with the event.
 	 */
-	wait<E extends Event = NeoEvent>(type: string) {
-		return new Promise<E>((resolve) => {
-			this.once<E>(
+	wait<
+		T extends string,
+		E extends Event | undefined = undefined,
+	>(
+		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
+	) {
+		type ET = E extends undefined
+			? EL extends undefined
+				? unknown
+				: T extends keyof EL
+					? EL[T]
+					: unknown
+			: E;
+
+		return new Promise<ET>((resolve) => {
+			this.once(
 				type,
 				(event) => {
-					resolve(event);
+					resolve(event as ET);
 				},
 			);
 		});
@@ -109,9 +144,25 @@ export class NeoEventTarget extends EventTarget {
 	 * Creates an instance of `NeoEvent` and dispatches it.
 	 * @param type - The event type to emit.
 	 * @param detail - Data to be set as event `detail` property.
+	 * @returns `true` if either event's cancelable attribute value is `false` or its preventDefault() method was not invoked, and `false` otherwise.
 	 */
-	emit(type: string, detail?: unknown) {
-		this.dispatchEvent(
+	emit<
+		T extends string,
+		D extends unknown | undefined = undefined,
+	>(
+		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
+		detail?: EL extends undefined
+			? D
+			: T extends keyof EL
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				? NeoEvent<any> extends EL[T]
+					? EL[T] extends NeoEvent<infer E>
+						? E
+						: never
+					: never
+				: never,
+	): boolean {
+		return super.dispatchEvent(
 			new NeoEvent(type, detail),
 		);
 	}

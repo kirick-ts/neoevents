@@ -2,12 +2,13 @@
 	"compileOnSave": false,
 	"include": [
 		"src/"
-	],
+, "src/main.test-d.ts"	],
 	"exclude": [
 		"dist/",
 		"node_modules/",
 		"test/",
-		"**/*.test.*"
+		"**/*.test.*",
+		"**/*.test-d.ts"
 	],
 	"compilerOptions": {
 		"outDir": "/dev/null",
