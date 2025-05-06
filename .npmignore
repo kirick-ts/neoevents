@@ -2,6 +2,7 @@
 **/*.test.*
 **/*.test.d.ts
 test/
+test-d/
 
 # ignore source files of the Typescript project
 src/
