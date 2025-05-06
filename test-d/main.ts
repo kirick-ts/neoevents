@@ -5,7 +5,7 @@ import {
 import {
 	NeoEvent,
 	NeoEventTarget,
-} from './main.js';
+} from '../src/main.js';
 
 const target = new NeoEventTarget();
 

@@ -1,6 +1,6 @@
 {
 	"name": "neoevents",
-	"version": "0.2.0",
+	"version": "0.2.1-dev",
 	"description": "",
 	"publishConfig": {
 		"access": "public"
@@ -33,20 +33,17 @@
 		"build": "tsdown src/main.ts --publint --unused --dts --format esm --format cjs && rm dist/main.d.cts",
 		"check": "bun run lint && bun run build && bun run test",
 		"lint": "eslint . && tsc --skipLibCheck --noemit",
-		"test": "tsd -f src/main.test-d.ts && bun test --coverage"
-	},
-	"tsd": {
-		"directory": "tsd"
+		"test": "tsd && bun test --coverage"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/kirick13/neoevents.git"
+		"url": "git+https://github.com/kirick-ts/neoevents.git"
 	},
 	"keywords": [],
 	"author": "Daniil Kirichenko (https://twitter.com/kirickme)",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/kirick13/neoevents/issues"
+		"url": "https://github.com/kirick-ts/neoevents/issues"
 	},
-	"homepage": "https://github.com/kirick13/neoevents#readme"
+	"homepage": "https://github.com/kirick-ts/neoevents#readme"
 }
