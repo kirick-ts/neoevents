@@ -1,6 +1,6 @@
 {
 	"name": "neoevents",
-	"version": "0.2.1-dev",
+	"version": "0.2.1",
 	"description": "",
 	"publishConfig": {
 		"access": "public"
