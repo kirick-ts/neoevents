@@ -2,25 +2,22 @@
 	"compileOnSave": false,
 	"include": [
 		"src/"
-, "src/main.test-d.ts"	],
+	],
 	"exclude": [
 		"dist/",
 		"node_modules/",
 		"test/",
-		"**/*.test.*",
-		"**/*.test-d.ts"
+		"**/*.test.*"
 	],
 	"compilerOptions": {
-		"outDir": "/dev/null",
 		"declaration": true,
-		"declarationDir": "dist/esm",
+		"isolatedDeclarations": true,
 		"target": "esnext",
 		"module": "esnext",
 		"lib": [
-			"ESNext",
-			"ES2021.String",
 			"DOM",
-			"WebWorker"
+			"ESNext",
+			"ES2021.String"
 		],
 		"moduleResolution": "node",
 		"allowSyntheticDefaultImports": true,

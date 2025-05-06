@@ -1,5 +1,3 @@
-"use strict";
-
 //#region src/main.ts
 var NeoEvent = class extends Event {
 	constructor(type, detail) {
@@ -67,5 +65,4 @@ var NeoEventTarget = class extends EventTarget {
 };
 
 //#endregion
-exports.NeoEvent = NeoEvent
-exports.NeoEventTarget = NeoEventTarget
+export { NeoEvent, NeoEventTarget };

@@ -18,6 +18,18 @@ interface EventListener {
 	(evt: Event): void;
 }
 
+type ExtractEvent<
+	EL extends Record<string, Event> | undefined,
+	T extends string,
+	E extends Event | undefined,
+> = E extends undefined
+	? EL extends undefined
+		? unknown
+		: T extends keyof EL
+			? EL[T]
+			: unknown
+	: E;
+
 export class NeoEvent<D = unknown> extends Event {
 	constructor(
 		type: string,
@@ -68,13 +80,7 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 	>(
 		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
 		listener: (
-			event: E extends undefined
-				? EL extends undefined
-					? unknown
-					: T extends keyof EL
-						? EL[T]
-						: unknown
-				: E
+			event: ExtractEvent<EL, T, E>
 		) => void,
 	): () => void {
 		return this.addListener(
@@ -121,20 +127,12 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 		E extends Event | undefined = undefined,
 	>(
 		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
-	) {
-		type ET = E extends undefined
-			? EL extends undefined
-				? unknown
-				: T extends keyof EL
-					? EL[T]
-					: unknown
-			: E;
-
-		return new Promise<ET>((resolve) => {
+	): Promise<ExtractEvent<EL, T, E>> {
+		return new Promise((resolve) => {
 			this.once(
 				type,
 				(event) => {
-					resolve(event as ET);
+					resolve(event as ExtractEvent<EL, T, E>);
 				},
 			);
 		});
@@ -170,7 +168,7 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 	/**
 	 * Destroys an event target, removing all listeners.
 	 */
-	destroy() {
+	destroy(): void {
 		for (const off of this.listeners) {
 			off();
 		}
