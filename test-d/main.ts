@@ -1,5 +1,3 @@
-/* eslint-disable n/no-unpublished-import */
-
 import {
 	expectType,
 	expectError,
