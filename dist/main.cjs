@@ -1,4 +1,3 @@
-"use strict";
 
 //#region src/main.ts
 var NeoEvent = class extends Event {
@@ -67,5 +66,5 @@ var NeoEventTarget = class extends EventTarget {
 };
 
 //#endregion
-exports.NeoEvent = NeoEvent
-exports.NeoEventTarget = NeoEventTarget
+exports.NeoEvent = NeoEvent;
+exports.NeoEventTarget = NeoEventTarget;

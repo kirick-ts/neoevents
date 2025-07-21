@@ -1,8 +1,8 @@
 import {
 	test,
 	expect,
-	mock,
-} from 'bun:test';
+	vi,
+} from 'vitest';
 import {
 	NeoEventTarget,
 } from './main.js';
@@ -10,7 +10,7 @@ import {
 test('on', () => {
 	const target = new NeoEventTarget();
 
-	const listener = mock();
+	const listener = vi.fn();
 	target.on('test', listener);
 
 	target.dispatchEvent(
@@ -30,7 +30,7 @@ test('on', () => {
 test('off', () => {
 	const target = new NeoEventTarget();
 
-	const listener = mock();
+	const listener = vi.fn();
 	const off = target.on('test', listener);
 
 	target.dispatchEvent(
@@ -52,7 +52,7 @@ test('off', () => {
 test('once', () => {
 	const target = new NeoEventTarget();
 
-	const listener = mock();
+	const listener = vi.fn();
 	target.once('test', listener);
 
 	target.dispatchEvent(
@@ -86,7 +86,7 @@ test('wait', async () => {
 test('emit', () => {
 	const target = new NeoEventTarget();
 
-	const listener = mock();
+	const listener = vi.fn();
 	target.on('test', listener);
 
 	target.emit('test');
@@ -98,7 +98,7 @@ test('emit', () => {
 test('destroy', () => {
 	const target = new NeoEventTarget();
 
-	const listener = mock();
+	const listener = vi.fn();
 	target.on('test', listener);
 
 	target.destroy();
