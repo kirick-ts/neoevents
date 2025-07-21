@@ -22,13 +22,20 @@ type ExtractEvent<
 	EL extends Record<string, Event> | undefined,
 	T extends string,
 	E extends Event | undefined,
-> = E extends undefined
-	? EL extends undefined
-		? unknown
-		: T extends keyof EL
-			? EL[T]
-			: unknown
-	: E;
+> = EL extends undefined
+	? E extends undefined
+		? Event
+		: E
+	: T extends keyof EL
+		? EL[T]
+		: never;
+
+type FilterEventList<EL, U> = {
+	[K in keyof EL]-?: U extends EL[K] ? EL[K] extends U ? K : never : never
+}[keyof EL];
+type FilterNeoEventWithVoid<EL> = FilterEventList<EL, NeoEvent<undefined>> | FilterEventList<EL, NeoEvent<void>>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FilterNeoEventWithValue<EL> = Exclude<FilterEventList<EL, NeoEvent<any>>, FilterNeoEventWithVoid<EL>>;
 
 export class NeoEvent<D = unknown> extends Event {
 	constructor(
@@ -101,13 +108,7 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 	>(
 		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
 		listener: (
-			event: E extends undefined
-				? EL extends undefined
-					? unknown
-					: T extends keyof EL
-						? EL[T]
-						: unknown
-				: E
+			event: ExtractEvent<EL, T, E>,
 		) => void,
 	): () => void {
 		return this.addListener(
@@ -144,21 +145,34 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 	 * @param detail - Data to be set as event `detail` property.
 	 * @returns `true` if either event's cancelable attribute value is `false` or its preventDefault() method was not invoked, and `false` otherwise.
 	 */
-	emit<
-		T extends string,
-		D extends unknown | undefined = undefined,
-	>(
-		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
-		detail?: EL extends undefined
-			? D
+	emit<T extends (EL extends undefined ? string : FilterNeoEventWithVoid<EL>)>(
+		type: T,
+	): boolean;
+	/**
+	 * Creates an instance of `NeoEvent` and dispatches it.
+	 * @param type - The event type to emit.
+	 * @param detail - Data to be set as event `detail` property.
+	 * @returns `true` if either event's cancelable attribute value is `false` or its preventDefault() method was not invoked, and `false` otherwise.
+	 */
+	emit<T extends (EL extends undefined ? string : FilterNeoEventWithValue<EL>)>(
+		type: T,
+		detail: EL extends undefined
+			? unknown
 			: T extends keyof EL
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				? NeoEvent<any> extends EL[T]
-					? EL[T] extends NeoEvent<infer E>
-						? E
-						: never
+				? EL[T] extends NeoEvent<infer E>
+					? E
 					: never
 				: never,
+	): boolean;
+	/**
+	 * Creates an instance of `NeoEvent` and dispatches it.
+	 * @param type - The event type to emit.
+	 * @param detail - Data to be set as event `detail` property.
+	 * @returns `true` if either event's cancelable attribute value is `false` or its preventDefault() method was not invoked, and `false` otherwise.
+	 */
+	emit(
+		type: string,
+		detail?: unknown,
 	): boolean {
 		return super.dispatchEvent(
 			new NeoEvent(type, detail),
