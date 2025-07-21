@@ -1,6 +1,6 @@
 {
 	"name": "neoevents",
-	"version": "0.3.0-dev",
+	"version": "0.3.0",
 	"description": "Type-safe EventEmitter",
 	"publishConfig": {
 		"access": "public"
