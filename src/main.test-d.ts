@@ -61,26 +61,26 @@ describe('typed target', () => {
 		target.emit('undefined');
 
 		// Can not pass data if NeoEvent is with undefined data type
-		// @ts-expect-error - Expected 1 arguments, but got 2.
+		// @ts-expect-error - Argument of type '"void"' is not assignable to parameter of type '"foo" | "bar"'.
 		target.emit('void', 123);
 
 		// Can not omit data if NeoEvent is with defined data type
 		// @ts-expect-error - Argument of type '"foo"' is not assignable to parameter of type 'FilterNeoEventWithVoid<TargetEvents>'.
 		target.emit('foo');
 
-		// @ts-expect-error - Type 'number' is not assignable to type '"foo"'.
+		// @ts-expect-error - Argument of type '123' is not assignable to parameter of type '"value"'.
 		target.emit('foo', 123);
 
 		target.emit('foo', 'value');
 
 		// `emit` cannot be used with events that are not subclasses of `NeoEvent`
-		// @ts-expect-error - Argument of type '123' is not assignable to parameter of type 'undefined'.
+		// @ts-expect-error - Argument of type '"click"' is not assignable to parameter of type '"foo" | "bar"'.
 		target.emit('click', 123);
 
-		// @ts-expect-error - Argument of type 'undefined' is not assignable to parameter of type 'never'.
+		// @ts-expect-error - Argument of type '"click"' is not assignable to parameter of type '"foo" | "bar"'.
 		target.emit('click', undefined);
 
-		// @ts-expect-error - Argument of type '"baz"' is not assignable to parameter of type 'keyof TargetEvents'.
+		// @ts-expect-error - Argument of type '"baz"' is not assignable to parameter of type '"foo" | "bar"'.
 		target.emit('baz', 123);
 	});
 
@@ -107,7 +107,7 @@ describe('typed target', () => {
 		}
 
 		// Can NOT redeclare type of listener if type map provided on NeoEventTarget
-		// @ts-expect-error - Argument of type '(_event: NeoEvent<boolean>) => void' is not assignable to parameter of type '(event: NeoEvent<"value">) => void
+		// @ts-expect-error - Argument of type '(_event: NeoEvent<boolean>) => void' is not assignable to parameter of type '(event: NeoEvent<"value">) => void'.
 		// oxlint-disable-next-line no-empty-function
 		target.on('foo', (_event: NeoEvent<boolean>) => {});
 	});
@@ -136,7 +136,7 @@ describe('typed target', () => {
 	});
 
 	test('not existing event', async () => {
-		// @ts-expect-error - Argument of type '"baz"' is not assignable to parameter of type 'keyof TargetEvents'.
+		// @ts-expect-error - Argument of type '"baz"' is not assignable to parameter of type 'FilterNeoEventWithVoid<TargetEvents>'.
 		setTimeout(() => target.emit('baz'));
 
 		// @ts-expect-error - Argument of type '"baz"' is not assignable to parameter of type 'keyof TargetEvents'.

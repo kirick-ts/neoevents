@@ -46,7 +46,16 @@
 		"type": "git",
 		"url": "git+https://github.com/kirick-ts/neoevents.git"
 	},
-	"keywords": [],
+	"keywords": [
+		"events",
+		"eventtarget",
+		"eventemitter",
+		"emitter",
+		"customevent",
+		"typescript",
+		"typesafe",
+		"typed-events"
+	],
 	"author": "Daniil Kirichenko (https://twitter.com/kirickme)",
 	"license": "MIT",
 	"bugs": {
