@@ -1,11 +1,5 @@
-import {
-	test,
-	expect,
-	vi,
-} from 'vitest';
-import {
-	NeoEventTarget,
-} from './main.js';
+import { expect, test, vi } from 'vitest';
+import { NeoEventTarget } from './main.js';
 
 test('on', () => {
 	const target = new NeoEventTarget();
@@ -13,16 +7,12 @@ test('on', () => {
 	const listener = vi.fn();
 	target.on('test', listener);
 
-	target.dispatchEvent(
-		new Event('test'),
-	);
+	target.dispatchEvent(new Event('test'));
 
 	expect(listener).toHaveBeenCalled();
 	expect(listener).toHaveBeenCalledTimes(1);
 
-	target.dispatchEvent(
-		new Event('test'),
-	);
+	target.dispatchEvent(new Event('test'));
 
 	expect(listener).toHaveBeenCalledTimes(2);
 });
@@ -33,18 +23,14 @@ test('off', () => {
 	const listener = vi.fn();
 	const off = target.on('test', listener);
 
-	target.dispatchEvent(
-		new Event('test'),
-	);
+	target.dispatchEvent(new Event('test'));
 
 	expect(listener).toHaveBeenCalled();
 	expect(listener).toHaveBeenCalledTimes(1);
 
 	off();
 
-	target.dispatchEvent(
-		new Event('test'),
-	);
+	target.dispatchEvent(new Event('test'));
 
 	expect(listener).toHaveBeenCalledTimes(1);
 });
@@ -55,16 +41,12 @@ test('once', () => {
 	const listener = vi.fn();
 	target.once('test', listener);
 
-	target.dispatchEvent(
-		new Event('test'),
-	);
+	target.dispatchEvent(new Event('test'));
 
 	expect(listener).toHaveBeenCalled();
 	expect(listener).toHaveBeenCalledTimes(1);
 
-	target.dispatchEvent(
-		new Event('test'),
-	);
+	target.dispatchEvent(new Event('test'));
 
 	expect(listener).toHaveBeenCalledTimes(1);
 });
@@ -74,9 +56,7 @@ test('wait', async () => {
 
 	const promise = target.wait('test');
 
-	target.dispatchEvent(
-		new Event('test'),
-	);
+	target.dispatchEvent(new Event('test'));
 
 	const event = await promise;
 
@@ -103,9 +83,7 @@ test('destroy', () => {
 
 	target.destroy();
 
-	target.dispatchEvent(
-		new Event('test'),
-	);
+	target.dispatchEvent(new Event('test'));
 
 	expect(listener).not.toHaveBeenCalled();
 });

@@ -1,13 +1,14 @@
-
-//#region src/main.ts
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+// src/main.ts
 var NeoEvent = class extends Event {
+	detail;
 	constructor(type, detail) {
 		super(type);
 		this.detail = detail;
 	}
 };
 var NeoEventTarget = class extends EventTarget {
-	listeners = new Set();
+	listeners = /* @__PURE__ */ new Set();
 	addListener(type, listener, options) {
 		this.addEventListener(type, listener, options);
 		const off = () => {
@@ -47,12 +48,6 @@ var NeoEventTarget = class extends EventTarget {
 			});
 		});
 	}
-	/**
-	* Creates an instance of `NeoEvent` and dispatches it.
-	* @param type - The event type to emit.
-	* @param detail - Data to be set as event `detail` property.
-	* @returns `true` if either event's cancelable attribute value is `false` or its preventDefault() method was not invoked, and `false` otherwise.
-	*/
 	emit(type, detail) {
 		return super.dispatchEvent(new NeoEvent(type, detail));
 	}
@@ -64,7 +59,5 @@ var NeoEventTarget = class extends EventTarget {
 		this.listeners.clear();
 	}
 };
-
-//#endregion
 exports.NeoEvent = NeoEvent;
 exports.NeoEventTarget = NeoEventTarget;

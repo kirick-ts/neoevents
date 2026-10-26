@@ -1,13 +1,5 @@
-import {
-	describe,
-	expect,
-	expectTypeOf,
-	test,
-} from 'vitest';
-import {
-	NeoEvent,
-	NeoEventTarget,
-} from '../src/main.js';
+import { describe, expect, expectTypeOf, test } from 'vitest';
+import { NeoEvent, NeoEventTarget } from '../src/main.js';
 
 test('untyped target', async () => {
 	const target = new NeoEventTarget();
@@ -44,18 +36,21 @@ test('untyped target', async () => {
 class TestEvent extends Event {
 	altKey = 100;
 
-	constructor(type: string, public detail: number) {
+	constructor(
+		type: string,
+		public detail: number,
+	) {
 		super(type);
 	}
 }
 
 describe('typed target', () => {
 	type TargetEvents = {
-		foo: NeoEvent<'value'>,
-		bar: NeoEvent<number>,
-		undefined: NeoEvent<undefined>,
-		void: NeoEvent<void>,
-		click: TestEvent,
+		foo: NeoEvent<'value'>;
+		bar: NeoEvent<number>;
+		undefined: NeoEvent<undefined>;
+		void: NeoEvent<void>;
+		click: TestEvent;
 	};
 
 	const target = new NeoEventTarget<TargetEvents>();
@@ -63,6 +58,11 @@ describe('typed target', () => {
 	test('emit', () => {
 		// Can omit data if NeoEvent is with undefined data type
 		target.emit('void');
+		target.emit('undefined');
+
+		// Can not pass data if NeoEvent is with undefined data type
+		// @ts-expect-error - Expected 1 arguments, but got 2.
+		target.emit('void', 123);
 
 		// Can not omit data if NeoEvent is with defined data type
 		// @ts-expect-error - Argument of type '"foo"' is not assignable to parameter of type 'FilterNeoEventWithVoid<TargetEvents>'.
@@ -108,7 +108,7 @@ describe('typed target', () => {
 
 		// Can NOT redeclare type of listener if type map provided on NeoEventTarget
 		// @ts-expect-error - Argument of type '(_event: NeoEvent<boolean>) => void' is not assignable to parameter of type '(event: NeoEvent<"value">) => void
-		// eslint-disable-next-line no-empty-function
+		// oxlint-disable-next-line no-empty-function
 		target.on('foo', (_event: NeoEvent<boolean>) => {});
 	});
 

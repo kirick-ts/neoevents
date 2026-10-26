@@ -1,11 +1,13 @@
 import { defineConfig } from 'vitest/config';
 
-// eslint-disable-next-line no-restricted-exports
 export default defineConfig({
 	test: {
-		include: [
-			'**/*.{test,spec}.?(c|m)[jt]s?(x)',
-			'**/*.test-d.ts',
-		],
+		// `*.test-d.ts` is handled by `typecheck.include`, not here:
+		// listing it in both runs the file twice, once per pool.
+		include: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+		typecheck: {
+			enabled: true,
+		},
+		fileParallelism: false,
 	},
 });
