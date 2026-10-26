@@ -4,7 +4,7 @@ Tiny extension of the standard `EventTarget` written in TypeScript, providing co
 
 ## Installation
 
-Use package manager of your choice to install `neoevents`.
+Use the package manager of your choice to install `neoevents`.
 
 ```sh
 bun i neoevents
@@ -31,7 +31,7 @@ const off = target.on('test', (event) => {
 off(); // Removes the event listener
 ```
 
-Method `once` acts like `addEventListener` with `{ once: true }` option. Also, like `on` method, it returns a function that removes the event listener when called.
+Method `once` acts like `addEventListener` with the `{ once: true }` option. Also, like the `on` method, it returns a function that removes the event listener when called.
 
 ```javascript
 const target = new NeoEventTarget();
@@ -68,9 +68,21 @@ target.dispatchEvent(
 target.emit('my-event', 'some data');
 ```
 
+Method `destroy` removes every listener that was added through `on`, `once` or `wait`. Listeners registered directly with `addEventListener` are not tracked, so they are left in place.
+
+```typescript
+const target = new NeoEventTarget();
+target.on('my-event', () => console.log('a'));
+target.once('my-event', () => console.log('b'));
+
+target.destroy(); // Both listeners are removed
+```
+
+Note that a pending `wait` promise never settles after `destroy`, because the listener backing it is removed before the event arrives. The target itself stays usable — you can add new listeners to it afterwards.
+
 ### Class `NeoEvent`
 
-Class `NeoEvent` extends the standard `Event`. It provides a `detail` property that is initialized with the second argument of the constructor. After dropping Node 16 support, this class will be replaced with `CustomEvent`.
+Class `NeoEvent` extends the standard `Event`. It provides a `detail` property that is initialized with the second argument of the constructor. This class will be replaced with the global `CustomEvent` once the minimum supported Node.js version is 20.13 or newer, where `CustomEvent` is stable.
 
 ```typescript
 const event = new NeoEvent('my-event', 'some data');
@@ -79,7 +91,7 @@ console.log(event.detail); // 'some data'
 
 ## Using with TypeScript
 
-If you are using TypeScript, you can type event listeners like this (if not typed, `event` will be `unknown`):
+If you are using TypeScript, you can type event listeners like this (if not typed, `event` will be `Event`):
 
 ```typescript
 const target = new NeoEventTarget();
@@ -111,14 +123,15 @@ target_typed.on('click', (event) => {
 
 // error: Argument of type '"foobar"' is not assignable to parameter of type 'keyof EventMap'.
 target_typed.on('foobar', (event) => {
-  console.log(event); // event is unknown, but who cares?
+  console.log(event); // event is `never`, but who cares?
 });
 ```
 
-Please note that `emit` method dispatches an instance of `NeoEvent`. So, if your event type is not a subclass of `NeoEvent`, you will not be able to use `emit` method:
+Please note that the `emit` method dispatches an instance of `NeoEvent`. So, if your event type is not a subclass of `NeoEvent`, you will not be able to use the `emit` method:
 
 ```typescript
-target.emit('click', 123); // error: Argument of type '123' is not assignable to parameter of type 'MouseEvent'.
+// error: Argument of type '"click"' is not assignable to parameter of type '"foo"'.
+target_typed.emit('click', 123);
 ```
 
 Unlike `emit`, `dispatchEvent` maintains the standard TypeScript typing and accepts any event object that extends `Event`.

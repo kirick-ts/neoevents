@@ -14,9 +14,7 @@ interface AddEventListenerOptions extends EventListenerOptions {
 	/** The listener will be removed when the given AbortSignal object's `abort()` method is called. */
 	signal?: AbortSignal;
 }
-interface EventListener {
-	(evt: Event): void;
-}
+type EventListener = (evt: Event) => void;
 
 type ExtractEvent<
 	EL extends Record<string, Event> | undefined,
@@ -31,11 +29,16 @@ type ExtractEvent<
 		: never;
 
 type FilterEventList<EL, U> = {
-	[K in keyof EL]-?: U extends EL[K] ? EL[K] extends U ? K : never : never
+	[K in keyof EL]-?: U extends EL[K] ? (EL[K] extends U ? K : never) : never;
 }[keyof EL];
-type FilterNeoEventWithVoid<EL> = FilterEventList<EL, NeoEvent<undefined>> | FilterEventList<EL, NeoEvent<void>>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FilterNeoEventWithValue<EL> = Exclude<FilterEventList<EL, NeoEvent<any>>, FilterNeoEventWithVoid<EL>>;
+type FilterNeoEventWithVoid<EL> =
+	| FilterEventList<EL, NeoEvent<undefined>>
+	| FilterEventList<EL, NeoEvent<void>>;
+type FilterNeoEventWithValue<EL> = Exclude<
+	// oxlint-disable-next-line typescript/no-explicit-any
+	FilterEventList<EL, NeoEvent<any>>,
+	FilterNeoEventWithVoid<EL>
+>;
 
 export class NeoEvent<D = unknown> extends Event {
 	constructor(
@@ -46,7 +49,9 @@ export class NeoEvent<D = unknown> extends Event {
 	}
 }
 
-export class NeoEventTarget<EL extends Record<string, Event> | undefined = undefined> extends EventTarget {
+export class NeoEventTarget<
+	EL extends Record<string, Event> | undefined = undefined,
+> extends EventTarget {
 	private listeners = new Set<() => void>();
 
 	private addListener<const E extends Event>(
@@ -54,18 +59,10 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 		listener: (event: E) => void,
 		options?: AddEventListenerOptions | boolean,
 	): () => void {
-		this.addEventListener(
-			type,
-			listener as EventListener,
-			options,
-		);
+		this.addEventListener(type, listener as EventListener, options);
 
 		const off = () => {
-			this.removeEventListener(
-				type,
-				listener as EventListener,
-				options,
-			);
+			this.removeEventListener(type, listener as EventListener, options);
 
 			this.listeners.delete(off);
 		};
@@ -81,19 +78,11 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 	 * @param listener - The event listener.
 	 * @returns A function that removes the event listener when called.
 	 */
-	on<
-		T extends string,
-		E extends Event | undefined = undefined,
-	>(
+	on<T extends string, E extends Event | undefined = undefined>(
 		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
-		listener: (
-			event: ExtractEvent<EL, T, E>
-		) => void,
+		listener: (event: ExtractEvent<EL, T, E>) => void,
 	): () => void {
-		return this.addListener(
-			type,
-			listener as (event: unknown) => void,
-		);
+		return this.addListener(type, listener as (event: unknown) => void);
 	}
 
 	/**
@@ -102,20 +91,13 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 	 * @param listener - The event listener.
 	 * @returns A function that removes the event listener when called.
 	 */
-	once<
-		T extends string,
-		E extends Event | undefined = undefined,
-	>(
+	once<T extends string, E extends Event | undefined = undefined>(
 		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
-		listener: (
-			event: ExtractEvent<EL, T, E>,
-		) => void,
+		listener: (event: ExtractEvent<EL, T, E>) => void,
 	): () => void {
-		return this.addListener(
-			type,
-			listener as (event: unknown) => void,
-			{ once: true },
-		);
+		return this.addListener(type, listener as (event: unknown) => void, {
+			once: true,
+		});
 	}
 
 	/**
@@ -123,29 +105,22 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 	 * @param type - The event type to listen for.
 	 * @returns Promise that resolves with the event.
 	 */
-	wait<
-		T extends string,
-		E extends Event | undefined = undefined,
-	>(
+	wait<T extends string, E extends Event | undefined = undefined>(
 		type: EL extends undefined ? T : T extends keyof EL ? T : keyof EL,
 	): Promise<ExtractEvent<EL, T, E>> {
 		return new Promise((resolve) => {
-			this.once(
-				type,
-				(event) => {
-					resolve(event as ExtractEvent<EL, T, E>);
-				},
-			);
+			this.once(type, (event) => {
+				resolve(event as ExtractEvent<EL, T, E>);
+			});
 		});
 	}
 
 	/**
-	 * Creates an instance of `NeoEvent` and dispatches it.
+	 * Creates an instance of `NeoEvent` with no data and dispatches it.
 	 * @param type - The event type to emit.
-	 * @param detail - Data to be set as event `detail` property.
 	 * @returns `true` if either event's cancelable attribute value is `false` or its preventDefault() method was not invoked, and `false` otherwise.
 	 */
-	emit<T extends (EL extends undefined ? string : FilterNeoEventWithVoid<EL>)>(
+	emit<T extends EL extends undefined ? string : FilterNeoEventWithVoid<EL>>(
 		type: T,
 	): boolean;
 	/**
@@ -154,7 +129,7 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 	 * @param detail - Data to be set as event `detail` property.
 	 * @returns `true` if either event's cancelable attribute value is `false` or its preventDefault() method was not invoked, and `false` otherwise.
 	 */
-	emit<T extends (EL extends undefined ? string : FilterNeoEventWithValue<EL>)>(
+	emit<T extends EL extends undefined ? string : FilterNeoEventWithValue<EL>>(
 		type: T,
 		detail: EL extends undefined
 			? unknown
@@ -164,19 +139,8 @@ export class NeoEventTarget<EL extends Record<string, Event> | undefined = undef
 					: never
 				: never,
 	): boolean;
-	/**
-	 * Creates an instance of `NeoEvent` and dispatches it.
-	 * @param type - The event type to emit.
-	 * @param detail - Data to be set as event `detail` property.
-	 * @returns `true` if either event's cancelable attribute value is `false` or its preventDefault() method was not invoked, and `false` otherwise.
-	 */
-	emit(
-		type: string,
-		detail?: unknown,
-	): boolean {
-		return super.dispatchEvent(
-			new NeoEvent(type, detail),
-		);
+	emit(type: string, detail?: unknown): boolean {
+		return super.dispatchEvent(new NeoEvent(type, detail));
 	}
 
 	/**
